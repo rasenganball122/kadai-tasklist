@@ -15,7 +15,7 @@
             <tbody>
                 @foreach($tasks as $task)
                     <tr>
-                        <td>{{$task->id}}</td>
+                        <td>{!! link_to_route("tasks.show", $task->id, ["task"=>$task->id]) !!}</td>
                         <td>{{$task->status}}</td>
                         <td>{{$task->content}}</td>
                     </tr>
@@ -27,12 +27,4 @@
     {{--タスク作成ページへのリンク--}}
     {!! link_to_route("tasks.create", "新規タスクの投稿", [], ["class"=>"btn btn-primary"]) !!}
     
-    {{--タスクの詳細ページへのリンク--}}
-    @foreach($tasks as $task)
-        <tr>
-        <td>{!! link_to_route("tasks.show", $task->id, ["task"=>$task->id]) !!}</td>
-        <td>{{$task->content}}</td>
-        <tr>{{$task->status}}</tr>
-        </tr>
-    @endforeach
 @endsection
