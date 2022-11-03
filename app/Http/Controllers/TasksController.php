@@ -40,6 +40,7 @@ class TasksController extends Controller
         if(\Auth::check()){
             return view("tasks.create");
         }
+        return view("tasks.index");
     }
 
     /**
