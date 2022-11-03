@@ -18,9 +18,9 @@
 
 Route::get("/", "TasksController@index");
 
-//ログイン状態でないとタスクの作成、編集、削除、表示ができない。
+//ログイン状態でないとタスクの作成、編集、削除、表示（詳細表示のみ）ができない。
 Route::group(["middleware"=>["auth"]], function(){
-    Route::resource("tasks", "TasksController");
+    Route::resource("tasks", "TasksController", ["only" => ["store", "create", "show", "update", "destroy", "edit"]]);
 });
 
 // ユーザ登録
