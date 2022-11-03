@@ -15,7 +15,7 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            return route('login.get');//ログインしていない状態でtasks.createにアクセスすると，login.getにアクセスさせる。
+            return route('tasks.index.get');//ログインしていない状態でtasks.createにアクセスすると，tasks.index.getにアクセスさせる。
         }
     }
 }
