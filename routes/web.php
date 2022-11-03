@@ -15,10 +15,13 @@
 /*Route::get('/', function () {
     return view('welcome')
     });*/
-    
+
 Route::get("/", "TasksController@index");
 
-Route::resource("tasks", "TasksController");
+//ログイン状態でないとタスクの作成、編集、削除、表示ができない。
+Route::group(["middleware"=>["auth"]], function(){
+    Route::resource("tasks", "TasksController");
+});
 
 // ユーザ登録
 Route::get("signup", "Auth\RegisterController@showRegistrationForm")->name("signup.get");
