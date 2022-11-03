@@ -37,7 +37,9 @@ class TasksController extends Controller
      */
     public function create()
     {
-        return view("tasks.create");
+        if(\Auth::check()){
+            return view("tasks.create");
+        }
     }
 
     /**
@@ -53,11 +55,13 @@ class TasksController extends Controller
             "content"=>"required|max:255",
         ]);
         
-        // 認証済みユーザ（閲覧者）の投稿として作成（リクエストされた値をもとに作成）
-        $request->user()->tasks()->create([
-            "content"=>$request->content,
-            "status"=>$request->status,
-        ]);
+        if(\Auth::check()){
+            // 認証済みユーザ（閲覧者）の投稿として作成（リクエストされた値をもとに作成）
+            $request->user()->tasks()->create([
+                "content"=>$request->content,
+                "status"=>$request->status,
+            ]);
+        }
         
         return redirect("/");
     }
