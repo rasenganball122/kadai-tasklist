@@ -15,11 +15,19 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks=Task::all();
+        $data=[];
         
-        return view("tasks.index", [
-            "tasks"=>$tasks,
-            ]);
+        if(\Auth::check()){
+            // 認証済みユーザを取得
+            $user=\Auth::user();
+            
+             // ユーザのタスクの一覧を作成日時の降順で取得
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->get();
+            
+            $data=["tasks"=>$tasks];
+        }
+        
+        return view("tasks.index", $data);
     }
 
     /**
@@ -29,11 +37,7 @@ class TasksController extends Controller
      */
     public function create()
     {
-        $task=new Task;
-        
-        return view("tasks.create", [
-            "task"=>$task,
-            ]);
+        return view("tasks.create");
     }
 
     /**
@@ -47,12 +51,13 @@ class TasksController extends Controller
         $request->validate([
             "status"=>"required|max:10",
             "content"=>"required|max:255",
-            ]);
+        ]);
         
-        $task=new Task;
-        $task->content=$request->content;
-        $task->status=$request->status;
-        $task->save();
+        // 認証済みユーザ（閲覧者）の投稿として作成（リクエストされた値をもとに作成）
+        $request->user()->tasks()->create([
+            "content"=>$request->content,
+            "status"=>$request->status,
+        ]);
         
         return redirect("/");
     }
@@ -65,11 +70,17 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        $task=Task::findORfail($id);
+        // idの値で投稿を検索して取得
+        $task=\App\Task::findORfail($id);
         
-        return view("tasks.show", [
-            "task"=>$task,
+        // 認証済みユーザ（閲覧者）がそのタスクの所有者である場合は、そのタスクの詳細を表示
+        if(\Auth::id()!==$task->user_id){
+            return redirect("/");
+        }else{
+            return view("tasks.show", [
+                "task"=>$task,
             ]);
+        }
     }
 
     /**
@@ -80,11 +91,16 @@ class TasksController extends Controller
      */
     public function edit($id)
     {
-        $task=Task::findORfail($id);
+        $task=\App\Task::findORfail($id);
         
-        return view("tasks.edit", [
-            "task"=>$task,
+         // 認証済みユーザ（閲覧者）がそのタスクの所有者である場合は、そのタスクの詳細を表示
+        if(\Auth::id()!==$task->user_id){
+            return redirect("/");
+        }else{
+            return view("tasks.edit", [
+                "task"=>$task,
             ]);
+        }
     }
 
     /**
@@ -102,11 +118,17 @@ class TasksController extends Controller
             ]);
         
         $task=Task::findORfail($id);
-        $task->content=$request->content;
-        $task->status=$request->status;
-        $task->save();
         
-        return redirect("/");
+         // 認証済みユーザ（閲覧者）がそのタスクの所有者である場合は、そのタスクを更新
+        if(\Auth::id()!==$task->user_id){
+            return redirect("/");
+        }else{
+            $task->content=$request->content;
+            $task->status=$request->status;
+            $task->save();
+        
+            return redirect("/");
+        };
     }
 
     /**
@@ -117,8 +139,15 @@ class TasksController extends Controller
      */
     public function destroy($id)
     {
-        $task=Task::findORfail($id);
-        $task->delete();
+        // idの値で投稿を検索して取得
+        $task=\App\Task::findOrFail($id);
+        
+        // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は、投稿を削除
+        if(\Auth::id()!==$task->user_id){
+            return redirect("/");
+        }else{
+            $task->delete();
+        }
         
         return redirect("/");
     }

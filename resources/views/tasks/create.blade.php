@@ -9,11 +9,11 @@
             </ul>
     @endif
     
-    <h1>新規タスク作成ページ</h1>
+    <h1>新規タスク作成</h1>
     
     <div class="row">
-        <div class="col-6">
-            {!! Form::model($task, ["route"=>"tasks.store"]) !!}
+        <div class="col-sm-6">
+            {!! Form::open(["route"=>"tasks.store"]) !!}
             
             <div class="form-group">
                 {!! Form::label("status", "進捗状況:") !!}
